@@ -1,3 +1,4 @@
+# coding: utf-8
 # Copyright 2015 Google Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +25,7 @@ from google.appengine.api import namespace_manager
 from google.appengine.ext import ndb
 import webapp2
 
+import logging
 
 class Counter(ndb.Model):
     count = ndb.IntegerProperty()
@@ -48,10 +50,14 @@ class DatastoreCounterHandler(webapp2.RequestHandler):
     if not specified."""
 
     def get(self, namespace='default'):
+
+        logging.debug("namespace:{}".format(namespace))
+
         global_count = update_counter('counter')
 
-        # Save the current namespace.
+        # Save the current namespace. デフォルトのnamespace
         previous_namespace = namespace_manager.get_namespace()
+        logging.debug("current:{}".format(previous_namespace))
         try:
             namespace_manager.set_namespace(namespace)
             namespace_count = update_counter('counter')
