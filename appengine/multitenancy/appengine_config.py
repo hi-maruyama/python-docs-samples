@@ -20,4 +20,4 @@ def namespace_manager_default_namespace_for_request():
     http://yellow-1317.appspot.com/datastore >> yellow-1317.appspot.com
     http://near109.com/datastore >> near109.com
     """
-    return os.environ.get('HTTP_HOST', '')
+    return os.environ.get('HTTP_HOST', '').replace(":", "")
