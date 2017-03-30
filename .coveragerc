@@ -1,16 +1,11 @@
 [run]
-include =
-    appengine/*
-    bigquery/*
-    blog/*
-    cloud_logging/*
-    compute/*
-    dns/*
-    datastore/*
-    managed_vms/*
-    monitoring/*
-    speech/*
-    storage/*
+omit =
+    lib/*
+    env/*
+    */.nox/*
+    */conftest.py
+    */google_appengine/*
+
 [report]
 exclude_lines =
     pragma: NO COVER

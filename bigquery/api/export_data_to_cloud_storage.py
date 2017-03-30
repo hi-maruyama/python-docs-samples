@@ -27,8 +27,7 @@ import argparse
 import time
 import uuid
 
-from googleapiclient import discovery
-from oauth2client.client import GoogleCredentials
+import googleapiclient.discovery
 
 
 # [START export_table]
@@ -54,7 +53,7 @@ def export_table(bigquery, cloud_storage_path,
     Returns: an extract job resource representing the
         job, see https://cloud.google.com/bigquery/docs/reference/v2/jobs
     """
-    # Generate a unique job_id so retries
+    # Generate a unique job ID so retries
     # don't accidentally duplicate export
     job_data = {
         'jobReference': {
@@ -107,11 +106,8 @@ def poll_job(bigquery, job):
 def main(cloud_storage_path, project_id, dataset_id, table_id,
          num_retries, interval, export_format="CSV", compression="NONE"):
     # [START build_service]
-    # Grab the application's default credentials from the environment.
-    credentials = GoogleCredentials.get_application_default()
-
     # Construct the service object for interacting with the BigQuery API.
-    bigquery = discovery.build('bigquery', 'v2', credentials=credentials)
+    bigquery = googleapiclient.discovery.build('bigquery', 'v2')
     # [END build_service]
 
     job = export_table(
@@ -154,6 +150,11 @@ if __name__ == '__main__':
         help='compress resultset with gzip',
         action='store_true',
         default=False)
+    parser.add_argument(
+        '-f', '--format',
+        help='output file format',
+        choices=['CSV', 'NEWLINE_DELIMITED_JSON', 'AVRO'],
+        default='CSV')
 
     args = parser.parse_args()
 
@@ -164,5 +165,6 @@ if __name__ == '__main__':
         args.table_id,
         args.num_retries,
         args.poll_interval,
+        export_format=args.format,
         compression="GZIP" if args.gzip else "NONE")
 # [END main]

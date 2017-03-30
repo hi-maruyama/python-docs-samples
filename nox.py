@@ -12,174 +12,273 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+
 import fnmatch
 import os
-import subprocess
 import tempfile
 
 import nox
 
-REPO_TOOLS_REQ =\
-    'git+https://github.com/GoogleCloudPlatform/python-repo-tools.git'
-
-COMMON_PYTEST_ARGS = [
-    '-x', '--no-success-flaky-report', '--cov', '--cov-config',
-    '.coveragerc', '--cov-append', '--cov-report=']
-
-# Speech is temporarily disabled.
-TESTS_BLACKLIST = set(('appengine', 'testing', 'speech'))
-APPENGINE_BLACKLIST = set()
+try:
+    import ci_diff_helper
+except ImportError:
+    ci_diff_helper = None
 
 
-def list_files(folder, pattern):
+#
+# Helpers and utility functions
+#
+
+def _list_files(folder, pattern):
+    """Lists all files below the given folder that match the pattern."""
     for root, folders, files in os.walk(folder):
         for filename in files:
             if fnmatch.fnmatch(filename, pattern):
                 yield os.path.join(root, filename)
 
 
-def collect_sample_dirs(start_dir, blacklist=set()):
-    """Recursively collects a list of dirs that contain tests."""
+def _collect_dirs(
+        start_dir,
+        blacklist=set(['conftest.py', 'nox.py']),
+        suffix='_test.py'):
+    """Recursively collects a list of dirs that contain a file matching the
+    given suffix.
+
+    This works by listing the contents of directories and finding
+    directories that have `*_test.py` files.
+    """
     # Collect all the directories that have tests in them.
     for parent, subdirs, files in os.walk(start_dir):
-        if any(f for f in files if f[-8:] == '_test.py'):
+        if any(f for f in files if f.endswith(suffix) and f not in blacklist):
             # Don't recurse further, since py.test will do that.
             del subdirs[:]
             # This dir has tests in it. yield it.
             yield parent
         else:
             # Filter out dirs we don't want to recurse into
-            subdirs[:] = [s for s in subdirs
-                          if s[0].isalpha() and s not in blacklist]
+            subdirs[:] = [
+                s for s in subdirs
+                if s[0].isalpha() and
+                os.path.join(parent, s) not in blacklist]
 
 
-def get_changed_files():
-    pr = os.environ.get('TRAVIS_PULL_REQUEST')
-    if pr == 'false':
-        # This is not a pull request.
-        changed = subprocess.check_output(
-            ['git', 'show', '--pretty=format:', '--name-only',
-                os.environ.get('TRAVIS_COMMIT')])
-    elif pr is not None:
-        changed = subprocess.check_output(
-            ['git', 'diff', '--name-only',
-                os.environ.get('TRAVIS_COMMIT'),
-                os.environ.get('TRAVIS_BRANCH')])
-    else:
-        changed = ''
-        print('Uh... where are we?')
-    return set([x for x in changed.split('\n') if x])
+def _get_changed_files():
+    """Returns a list of files changed for this pull request / push.
+
+    If running on a public CI like Travis or Circle this is used to only
+    run tests/lint for changed files.
+    """
+    if not ci_diff_helper:
+        return None
+
+    try:
+        config = ci_diff_helper.get_config()
+    except OSError:  # Not on CI.
+        return None
+
+    changed_files = ci_diff_helper.get_changed_files('HEAD', config.base)
+
+    changed_files = set([
+        './{}'.format(filename) for filename in changed_files])
+
+    return changed_files
 
 
-def filter_samples(sample_dirs, changed_files):
+def _filter_samples(sample_dirs, changed_files):
+    """Filers the list of sample directories to only include directories that
+    contain files in the list of changed files."""
     result = []
     for sample_dir in sample_dirs:
-        if sample_dir.startswith('./'):
-            sample_dir = sample_dir[2:]
         for changed_file in changed_files:
             if changed_file.startswith(sample_dir):
                 result.append(sample_dir)
 
-    return result
+    return list(set(result))
 
 
-def setup_appengine(session):
-    # Install the app engine sdk and setup import paths.
-    gae_root = os.environ.get('GAE_ROOT', tempfile.gettempdir())
-    session.env['PYTHONPATH'] = os.path.join(gae_root, 'google_appengine')
-    session.run('gcprepotools', 'download-appengine-sdk', gae_root)
+def _determine_local_import_names(start_dir):
+    """Determines all import names that should be considered "local".
 
-    # Create a lib directory to prevent the GAE vendor library from
-    # complaining.
-    if not os.path.exists('lib'):
-        os.makedirs('lib')
+    This is used when running the linter to insure that import order is
+    properly checked.
+    """
+    file_ext_pairs = [os.path.splitext(path) for path in os.listdir(start_dir)]
+    return [
+        basename
+        for basename, extension
+        in file_ext_pairs
+        if extension == '.py' or os.path.isdir(
+            os.path.join(start_dir, basename))
+        and basename not in ('__pycache__')]
 
+#
+# App Engine specific helpers
+#
 
-def run_tests_in_sesssion(
-        session, interpreter, use_appengine=False, skip_flaky=False,
-        changed_only=False):
-    session.interpreter = interpreter
-    session.install(REPO_TOOLS_REQ)
-    session.install('-r', 'requirements-{}-dev.txt'.format(interpreter))
-
-    if use_appengine:
-        setup_appengine(session)
-        sample_root = 'appengine'
-    else:
-        sample_root = '.'
-
-    pytest_args = COMMON_PYTEST_ARGS[:]
-
-    if skip_flaky:
-        pytest_args.append('-m not slow and not flaky')
-
-    # session.posargs is any leftover arguments from the command line, which
-    # allows users to run a particular test instead of all of them.
-    if session.posargs:
-        sample_directories = session.posargs
-    else:
-        sample_directories = collect_sample_dirs(
-            sample_root,
-            TESTS_BLACKLIST if not use_appengine else APPENGINE_BLACKLIST)
-
-    if changed_only:
-        changed_files = get_changed_files()
-        sample_directories = filter_samples(
-            sample_directories, changed_files)
-        print('Running tests on a subset of samples: ')
-        print('\n'.join(sample_directories))
-
-    for sample in sample_directories:
-        # Install additional dependencies if they exist
-        dirname = sample if os.path.isdir(sample) else os.path.dirname(sample)
-        for reqfile in list_files(dirname, 'requirements*.txt'):
-            session.install('-r', reqfile)
-
-        session.run(
-            'py.test', sample,
-            *pytest_args,
-            success_codes=[0, 5])  # Treat no test collected as success.
+_GAE_ROOT = os.environ.get('GAE_ROOT')
+if _GAE_ROOT is None:
+    _GAE_ROOT = tempfile.mkdtemp()
 
 
-@nox.parametrize('interpreter', ['python2.7', 'python3.4'])
-def session_tests(session, interpreter):
-    run_tests_in_sesssion(session, interpreter)
+def _setup_appengine_sdk(session):
+    """Installs the App Engine SDK, if needed."""
+    session.env['GAE_SDK_PATH'] = os.path.join(_GAE_ROOT, 'google_appengine')
+    session.run('gcprepotools', 'download-appengine-sdk', _GAE_ROOT)
 
 
-def session_gae(session):
-    run_tests_in_sesssion(
-        session, 'python2.7', use_appengine=True)
+#
+# Test sessions
+#
 
 
-@nox.parametrize('subsession', ['gae', 'tests'])
-def session_travis(session, subsession):
-    """On travis, just run with python3.4 and don't run slow or flaky tests."""
-    if subsession == 'tests':
-        run_tests_in_sesssion(
-            session, 'python3.4', skip_flaky=True, changed_only=True)
-    else:
-        run_tests_in_sesssion(
-            session, 'python2.7', use_appengine=True, skip_flaky=True,
-            changed_only=True)
+PYTEST_COMMON_ARGS = [
+    '--cov',
+    '--cov-config', os.path.abspath('.coveragerc'),
+    '--cov-report', 'term']
+
+FLAKE8_COMMON_ARGS = [
+    '--show-source', '--builtin', 'gettext', '--max-complexity', '20',
+    '--import-order-style', 'google',
+    '--exclude', '.nox,.cache,env,lib,generated_pb2,*_pb2.py,*_pb2_grpc.py',
+]
+
+# Location of our common testing utilities. This isn't published to PyPI.
+GCP_REPO_TOOLS_REQ =\
+    'git+https://github.com/GoogleCloudPlatform/python-repo-tools.git'
 
 
-def session_lint(session):
-    session.install('flake8', 'flake8-import-order')
+# Collect sample directories.
+ALL_TESTED_SAMPLES = sorted(list(_collect_dirs('.')))
+ALL_SAMPLE_DIRECTORIES = sorted(list(_collect_dirs('.', suffix='.py')))
+GAE_STANDARD_SAMPLES = [
+    sample for sample in ALL_TESTED_SAMPLES
+    if sample.startswith('./appengine/standard')]
+NON_GAE_STANDARD_SAMPLES = sorted(
+    list(set(ALL_TESTED_SAMPLES) - set(GAE_STANDARD_SAMPLES)))
+
+
+# Filter sample directories if on a CI like Travis or Circle to only run tests
+# for changed samples.
+CHANGED_FILES = _get_changed_files()
+
+if CHANGED_FILES is not None:
+    print('Filtering based on changed files.')
+    ALL_TESTED_SAMPLES = _filter_samples(
+        ALL_TESTED_SAMPLES, CHANGED_FILES)
+    ALL_SAMPLE_DIRECTORIES = _filter_samples(
+        ALL_SAMPLE_DIRECTORIES, CHANGED_FILES)
+    GAE_STANDARD_SAMPLES = _filter_samples(
+        GAE_STANDARD_SAMPLES, CHANGED_FILES)
+    NON_GAE_STANDARD_SAMPLES = _filter_samples(
+        NON_GAE_STANDARD_SAMPLES, CHANGED_FILES)
+
+
+def _session_tests(session, sample):
+    """Runs py.test for a particular sample."""
+    session.install('-r', 'testing/requirements.txt')
+    session.install(GCP_REPO_TOOLS_REQ)
+
+    session.chdir(sample)
+
+    if os.path.exists(os.path.join(sample, 'requirements.txt')):
+        session.install('-r', 'requirements.txt')
+
     session.run(
-        'flake8', '--builtin=gettext', '--max-complexity=10',
-        '--import-order-style=google',
-        '--exclude',
-        'container_engine/django_tutorial/polls/migrations/*,.nox,.cache,env',
-        *(session.posargs or ['.']))
+        'pytest',
+        *(PYTEST_COMMON_ARGS + session.posargs),
+        # Pytest will return 5 when no tests are collected. This can happen
+        # on travis where slow and flaky tests are excluded.
+        # See http://doc.pytest.org/en/latest/_modules/_pytest/main.html
+        success_codes=[0, 5])
 
 
-def session_reqcheck(session):
-    session.install(REPO_TOOLS_REQ)
+@nox.parametrize('sample', GAE_STANDARD_SAMPLES)
+def session_gae(session, sample):
+    """Runs py.test for an App Engine standard sample."""
+    session.interpreter = 'python2.7'
+    session.install(GCP_REPO_TOOLS_REQ)
+    _setup_appengine_sdk(session)
+
+    # Create a lib directory if needed, otherwise the App Engine vendor library
+    # will complain.
+    if not os.path.isdir(os.path.join(sample, 'lib')):
+        os.mkdir(os.path.join(sample, 'lib'))
+
+    _session_tests(session, sample)
+
+
+@nox.parametrize('sample', NON_GAE_STANDARD_SAMPLES)
+def session_py27(session, sample):
+    """Runs py.test for a sample using Python 2.7"""
+    session.interpreter = 'python2.7'
+    _session_tests(session, sample)
+
+
+@nox.parametrize('sample', NON_GAE_STANDARD_SAMPLES)
+def session_py35(session, sample):
+    """Runs py.test for a sample using Python 3.5"""
+    session.interpreter = 'python3.5'
+    _session_tests(session, sample)
+
+
+@nox.parametrize('sample', ALL_SAMPLE_DIRECTORIES)
+def session_lint(session, sample):
+    """Runs flake8 on the sample."""
+    session.install('flake8', 'flake8-import-order')
+
+    local_names = _determine_local_import_names(sample)
+    args = FLAKE8_COMMON_ARGS + [
+        '--application-import-names', ','.join(local_names),
+        '.']
+
+    session.chdir(sample)
+    session.run('flake8', *args)
+
+
+#
+# Utility sessions
+#
+
+
+def session_missing_tests(session):
+    """Lists all sample directories that do not have tests."""
+    session.virtualenv = False
+    print('The following samples do not have tests:')
+    for sample in set(ALL_SAMPLE_DIRECTORIES) - set(ALL_TESTED_SAMPLES):
+        print('* {}'.format(sample))
+
+
+SAMPLES_WITH_GENERATED_READMES = sorted(
+    list(_collect_dirs('.', suffix='.rst.in')))
+
+
+@nox.parametrize('sample', SAMPLES_WITH_GENERATED_READMES)
+def session_readmegen(session, sample):
+    """(Re-)generates the readme for a sample."""
+    session.install('jinja2', 'pyyaml')
+
+    if os.path.exists(os.path.join(sample, 'requirements.txt')):
+        session.install('-r', os.path.join(sample, 'requirements.txt'))
+
+    in_file = os.path.join(sample, 'README.rst.in')
+    session.run('python', 'scripts/readme-gen/readme_gen.py', in_file)
+
+
+def session_check_requirements(session):
+    """Checks for out of date requirements and optionally updates them.
+
+    This is intentionally not parametric, as it's desired to never have two
+    samples with differing versions of dependencies.
+    """
+    session.install(GCP_REPO_TOOLS_REQ)
 
     if 'update' in session.posargs:
         command = 'update-requirements'
     else:
         command = 'check-requirements'
 
-    for reqfile in list_files('.', 'requirements*.txt'):
+    reqfiles = list(_list_files('.', 'requirements*.txt'))
+
+    for reqfile in reqfiles:
         session.run('gcprepotools', command, reqfile)

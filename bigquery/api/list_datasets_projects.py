@@ -25,8 +25,7 @@ For more information, see the README.md under /bigquery.
 import argparse
 from pprint import pprint
 
-from googleapiclient import discovery
-from oauth2client.client import GoogleCredentials
+import googleapiclient.discovery
 from six.moves.urllib.error import HTTPError
 
 
@@ -47,7 +46,6 @@ def list_datasets(bigquery, project):
 # [START list_projects]
 def list_projects(bigquery):
     try:
-        # Start training on a data set
         projects = bigquery.projects()
         list_reply = projects.list().execute()
 
@@ -61,12 +59,12 @@ def list_projects(bigquery):
 
 
 def main(project_id):
-    credentials = GoogleCredentials.get_application_default()
     # Construct the service object for interacting with the BigQuery API.
-    bigquery = discovery.build('bigquery', 'v2', credentials=credentials)
+    bigquery = googleapiclient.discovery.build('bigquery', 'v2')
 
     list_datasets(bigquery, project_id)
     list_projects(bigquery)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

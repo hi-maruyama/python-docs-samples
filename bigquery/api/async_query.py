@@ -15,10 +15,6 @@
 
 """Command-line application to perform an asynchronous query in BigQuery.
 
-This sample is used on this page:
-
-    https://cloud.google.com/bigquery/querying-data#asyncqueries
-
 For more information, see the README.md under /bigquery.
 """
 
@@ -27,23 +23,27 @@ import json
 import time
 import uuid
 
-from googleapiclient import discovery
-from oauth2client.client import GoogleCredentials
+import googleapiclient.discovery
 
 
 # [START async_query]
-def async_query(bigquery, project_id, query, batch=False, num_retries=5):
-    # Generate a unique job_id so retries
+def async_query(
+        bigquery, project_id, query,
+        batch=False, num_retries=5, use_legacy_sql=False):
+    # Generate a unique job ID so retries
     # don't accidentally duplicate query
     job_data = {
         'jobReference': {
             'projectId': project_id,
-            'job_id': str(uuid.uuid4())
+            'jobId': str(uuid.uuid4())
         },
         'configuration': {
             'query': {
                 'query': query,
-                'priority': 'BATCH' if batch else 'INTERACTIVE'
+                'priority': 'BATCH' if batch else 'INTERACTIVE',
+                # Set to False to use standard SQL syntax. See:
+                # https://cloud.google.com/bigquery/sql-reference/enabling-standard-sql
+                'useLegacySql': use_legacy_sql
             }
         }
     }
@@ -77,13 +77,12 @@ def poll_job(bigquery, job):
 
 
 # [START run]
-def main(project_id, query_string, batch, num_retries, interval):
+def main(
+        project_id, query_string, batch, num_retries, interval,
+        use_legacy_sql):
     # [START build_service]
-    # Grab the application's default credentials from the environment.
-    credentials = GoogleCredentials.get_application_default()
-
     # Construct the service object for interacting with the BigQuery API.
-    bigquery = discovery.build('bigquery', 'v2', credentials=credentials)
+    bigquery = googleapiclient.discovery.build('bigquery', 'v2')
     # [END build_service]
 
     # Submit the job and wait for it to complete.
@@ -92,7 +91,8 @@ def main(project_id, query_string, batch, num_retries, interval):
         project_id,
         query_string,
         batch,
-        num_retries)
+        num_retries,
+        use_legacy_sql)
 
     poll_job(bigquery, query_job)
 
@@ -130,6 +130,11 @@ if __name__ == '__main__':
         help='How often to poll the query for completion (seconds).',
         type=int,
         default=1)
+    parser.add_argument(
+        '-l', '--use_legacy_sql',
+        help='Use legacy BigQuery SQL syntax instead of standard SQL syntax.',
+        type=bool,
+        default=False)
 
     args = parser.parse_args()
 
@@ -138,5 +143,6 @@ if __name__ == '__main__':
         args.query,
         args.batch,
         args.num_retries,
-        args.poll_interval)
+        args.poll_interval,
+        args.use_legacy_sql)
 # [END main]

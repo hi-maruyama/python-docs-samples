@@ -13,9 +13,9 @@
 
 import os
 
+import googleapiclient.discovery
+
 import generate_wrapped_rsa_key
-from googleapiclient import discovery
-from oauth2client.client import GoogleCredentials
 
 
 def test_main():
@@ -23,8 +23,7 @@ def test_main():
 
 
 def test_create_disk(cloud_config):
-    credentials = GoogleCredentials.get_application_default()
-    compute = discovery.build('compute', 'beta', credentials=credentials)
+    compute = googleapiclient.discovery.build('compute', 'beta')
 
     # Generate the key.
     key_bytes = os.urandom(32)

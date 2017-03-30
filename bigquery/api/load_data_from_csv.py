@@ -28,8 +28,7 @@ import json
 import time
 import uuid
 
-from googleapiclient import discovery
-from oauth2client.client import GoogleCredentials
+import googleapiclient.discovery
 
 
 # [START load_table]
@@ -50,12 +49,12 @@ def load_table(bigquery, project_id, dataset_id, table_name, source_schema,
     https://cloud.google.com/bigquery/docs/reference/v2/jobs#configuration.load
     """
 
-    # Generate a unique job_id so retries
+    # Generate a unique job ID so retries
     # don't accidentally duplicate query
     job_data = {
         'jobReference': {
             'projectId': project_id,
-            'job_id': str(uuid.uuid4())
+            'jobId': str(uuid.uuid4())
         },
         'configuration': {
             'load': {
@@ -105,11 +104,8 @@ def poll_job(bigquery, job):
 def main(project_id, dataset_id, table_name, schema_file, data_path,
          poll_interval, num_retries):
     # [START build_service]
-    # Grab the application's default credentials from the environment.
-    credentials = GoogleCredentials.get_application_default()
-
     # Construct the service object for interacting with the BigQuery API.
-    bigquery = discovery.build('bigquery', 'v2', credentials=credentials)
+    bigquery = googleapiclient.discovery.build('bigquery', 'v2')
     # [END build_service]
 
     with open(schema_file, 'r') as f:

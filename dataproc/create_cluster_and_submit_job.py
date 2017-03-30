@@ -16,9 +16,8 @@
 import argparse
 import os
 
-from apiclient import discovery
-from gcloud import storage
-from oauth2client.client import GoogleCredentials
+from google.cloud import storage
+import googleapiclient.discovery
 
 # Currently only the "global" region is supported
 REGION = 'global'
@@ -177,8 +176,7 @@ def wait_for_job(dataproc, project, job_id):
 def get_client():
     """Builds an http client authenticated with the service account
     credentials."""
-    credentials = GoogleCredentials.get_application_default()
-    dataproc = discovery.build('dataproc', 'v1', credentials=credentials)
+    dataproc = googleapiclient.discovery.build('dataproc', 'v1')
     return dataproc
 # [END get_client]
 
@@ -224,7 +222,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--zone', help='Region to create clusters in', required=True)
     parser.add_argument(
-        '--cluster_name', help='Region to create clusters in', required=True)
+        '--cluster_name', help='Name of the cluster to create', required=True)
     parser.add_argument(
         '--gcs_bucket', help='Bucket to upload Pyspark file to', required=True)
     parser.add_argument(

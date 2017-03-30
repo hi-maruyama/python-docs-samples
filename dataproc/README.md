@@ -6,7 +6,7 @@ Note that while this sample demonstrates interacting with Dataproc via the API, 
 demonstrated here could also be accomplished using the Cloud Console or the gcloud CLI.
 
 `list_clusters.py` is a simple command-line program to demonstrate connecting to the
-Dataproc API and listing the clusters in a ergion
+Dataproc API and listing the clusters in a region
 
 `create_cluster_and_submit_job.py` demonstrates how to create a cluster, submit the 
 `pyspark_sort.py` job, download the output from Google Cloud Storage, and output the result.
@@ -60,4 +60,4 @@ you create the instance with the correct scopes.
     gcloud compute instances create --scopes="https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/compute,https://www.googleapis.com/auth/compute.readonly" test-instance
 
 If you did not create the instance with the right scopes, you can still upload a JSON service 
-account and set GOOGLE_APPLICATION_CREDENTIALS as described below.
+account and set `GOOGLE_APPLICATION_CREDENTIALS`. See [Google Application Default Credentials](https://developers.google.com/identity/protocols/application-default-credentials) for more details.
