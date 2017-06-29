@@ -28,7 +28,7 @@ authentication:
 
     .. code-block:: bash
 
-        gcloud beta auth application-default login
+        gcloud auth application-default login
 
 
 #. When running on App Engine or Compute Engine, credentials are already
@@ -95,16 +95,17 @@ To run this sample:
 
     $ python snippets.py
 
-    usage: snippets.py [-h] [--project_id PROJECT_ID]
-                       {create-metric-descriptor,list-metric-descriptors,delete-metric-descriptor,list-resources,get-resource,write-time-series,list-time-series,list-time-series-header,list-time-series-reduce,list-time-series-aggregate}
+    usage: snippets.py [-h]
+                       {create-metric-descriptor,list-metric-descriptors,get-metric-descriptor,delete-metric-descriptor,list-resources,get-resource,write-time-series,list-time-series,list-time-series-header,list-time-series-reduce,list-time-series-aggregate}
                        ...
     
     Demonstrates Monitoring API operations.
     
     positional arguments:
-      {create-metric-descriptor,list-metric-descriptors,delete-metric-descriptor,list-resources,get-resource,write-time-series,list-time-series,list-time-series-header,list-time-series-reduce,list-time-series-aggregate}
+      {create-metric-descriptor,list-metric-descriptors,get-metric-descriptor,delete-metric-descriptor,list-resources,get-resource,write-time-series,list-time-series,list-time-series-header,list-time-series-reduce,list-time-series-aggregate}
         create-metric-descriptor
         list-metric-descriptors
+        get-metric-descriptor
         delete-metric-descriptor
         list-resources
         get-resource
@@ -116,8 +117,6 @@ To run this sample:
     
     optional arguments:
       -h, --help            show this help message and exit
-      --project_id PROJECT_ID
-                            Your cloud project ID.
 
 
 
@@ -129,11 +128,11 @@ This sample uses the `Google Cloud Client Library for Python`_.
 You can read the documentation for more details on API usage and use GitHub
 to `browse the source`_ and  `report issues`_.
 
-.. Google Cloud Client Library for Python:
+.. _Google Cloud Client Library for Python:
     https://googlecloudplatform.github.io/google-cloud-python/
-.. browse the source:
+.. _browse the source:
     https://github.com/GoogleCloudPlatform/google-cloud-python
-.. report issues:
+.. _report issues:
     https://github.com/GoogleCloudPlatform/google-cloud-python/issues
 
 

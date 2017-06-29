@@ -26,7 +26,7 @@ authentication:
 
     .. code-block:: bash
 
-        gcloud beta auth application-default login
+        gcloud auth application-default login
 
 
 #. When running on App Engine or Compute Engine, credentials are already
@@ -127,10 +127,35 @@ To run this sample:
     
     Example usage:
         python transcribe_async.py resources/audio.raw
-        python transcribe_async.py gs://cloud-samples-tests/speech/brooklyn.flac
+        python transcribe_async.py gs://cloud-samples-tests/speech/vr.flac
     
     positional arguments:
       path        File or GCS path for audio file to be recognized
+    
+    optional arguments:
+      -h, --help  show this help message and exit
+
+
+Transcribe Streaming
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+To run this sample:
+
+.. code-block:: bash
+
+    $ python transcribe_streaming.py
+
+    usage: transcribe_streaming.py [-h] stream
+    
+    Google Cloud Speech API sample application using the streaming API.
+    
+    Example usage:
+        python transcribe_streaming.py resources/audio.raw
+    
+    positional arguments:
+      stream      File to stream to the API
     
     optional arguments:
       -h, --help  show this help message and exit
@@ -145,11 +170,11 @@ This sample uses the `Google Cloud Client Library for Python`_.
 You can read the documentation for more details on API usage and use GitHub
 to `browse the source`_ and  `report issues`_.
 
-.. Google Cloud Client Library for Python:
+.. _Google Cloud Client Library for Python:
     https://googlecloudplatform.github.io/google-cloud-python/
-.. browse the source:
+.. _browse the source:
     https://github.com/GoogleCloudPlatform/google-cloud-python
-.. report issues:
+.. _report issues:
     https://github.com/GoogleCloudPlatform/google-cloud-python/issues
 
 

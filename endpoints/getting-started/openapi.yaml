@@ -6,6 +6,9 @@ info:
   version: "1.0.0"
 host: "echo-api.endpoints.YOUR-PROJECT-ID.cloud.goog"
 # [END swagger]
+# For App Engine deployments, delete the above "host:" line and remove the "# "
+# from the following line. Then change YOUR-PROJECT-ID to your project id.
+# host: "YOUR-PROJECT-ID.appspot.com"
 basePath: "/"
 consumes:
 - "application/json"
@@ -141,8 +144,8 @@ securityDefinitions:
     authorizationUrl: ""
     flow: "implicit"
     type: "oauth2"
-    x-google-issuer: "accounts.google.com"
-    x-google-jwks_uri: "https://www.googleapis.com/oauth2/v1/certs"
+    x-google-issuer: "https://accounts.google.com"
+    x-google-jwks_uri: "https://www.googleapis.com/oauth2/v3/certs"
     # Your OAuth2 client's Client ID must be added here. You can add multiple client IDs to accept tokens form multiple clients.
     x-google-audiences: "YOUR-CLIENT-ID"
   # This section configures authentication using Firebase Auth.
