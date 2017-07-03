@@ -1,3 +1,4 @@
+# coding: utf-8
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +35,7 @@ from google.appengine.ext import ndb
 import httplib2
 from oauth2client.client import GoogleCredentials
 
+import logging
 
 _FIREBASE_CONFIG = '_firebase_config.html'
 
@@ -61,6 +63,7 @@ def _get_firebase_db_url():
     """Grabs the databaseURL from the Firebase config snippet. Regex looks
     scary, but all it is doing is pulling the 'databaseURL' field from the
     Firebase javascript snippet"""
+    # import pdb; pdb.set_trace()
     regex = re.compile(r'\bdatabaseURL\b.*?["\']([^"\']+)')
     cwd = os.path.dirname(__file__)
     try:
@@ -93,8 +96,12 @@ def _send_firebase_message(u_id, message=None):
      is deleted using the DELETE http method
      """
     url = '{}/channels/{}.json'.format(_get_firebase_db_url(), u_id)
+    logging.info("url:{}".format(url))
+    # url:https://testbase-5a01a.firebaseio.com/channels/100966303282178133344100966303282178133344.json
 
+    # 指定されたユーザーのゲーム状況を保存する
     if message:
+        # 置換する
         return _get_http().request(url, 'PATCH', body=message)
     else:
         return _get_http().request(url, 'DELETE')
@@ -111,7 +118,10 @@ def create_custom_token(uid, valid_minutes=60):
 
     # use the app_identity service from google.appengine.api to get the
     # project's service account email automatically
+    # アプリのサービスアカウント名を取得する
     client_email = app_identity.get_service_account_name()
+    logging.info("client_email:{} ".format(client_email))
+    # client_email:testbase-5a01a@appspot.gserviceaccount.com
 
     now = int(time.time())
     # encode the required claims
@@ -219,6 +229,10 @@ def delete():
 
 @app.route('/opened', methods=['POST'])
 def opened():
+    ''' クライアントがfirebaseのリッスンに成功した時
+
+    :return:
+    '''
     game = Game.get_by_id(request.args.get('g'))
     if not game:
         return 'Game not found', 400
@@ -230,14 +244,20 @@ def opened():
 def main_page():
     """Renders the main page. When this page is shown, we create a new
     channel to push asynchronous updates to the client."""
+    # Sign-in ユーザーオブジェクト
     user = users.get_current_user()
+    # ゲーム識別子を取得する
     game_key = request.args.get('g')
 
     if not game_key:
+        # ゲーム識別子が無い場合
+        # 新規にゲームを作成して保存する
+        # game_key: ユーザーID
         game_key = user.user_id()
         game = Game(id=game_key, userX=user, moveX=True, board=' '*9)
         game.put()
     else:
+        # ゲーム識別子がある場合
         game = Game.get_by_id(game_key)
         if not game:
             return 'No such game', 404
@@ -245,15 +265,25 @@ def main_page():
             game.userO = user
             game.put()
 
-    # [START pass_token]
+
+    logging.info("game_key:{} game:{}".format(game_key, game))
+    # game_key:100966303282178133344 game:Game(key=Key('Game', '100966303282178133344'), board=u'         ', moveX=True, userX=users.User(email='maruyama@gmail.com',_user_id='100966303282178133344'))
+
     # choose a unique identifier for channel_id
     channel_id = user.user_id() + game_key
+    logging.info("channel_id:{} ".format(channel_id))
+    # channel_id:100966303282178133344100966303282178133344
+
     # encrypt the channel_id and send it as a custom token to the
     # client
     # Firebase's data security rules will be able to decrypt the
     # token and prevent unauthorized access
+    # 暗号化する
     client_auth_token = create_custom_token(channel_id)
+    logging.info("client_auth_token:{} ".format(client_auth_token))
+
     _send_firebase_message(channel_id, message=game.to_json())
+
 
     # game_link is a url that you can open in another browser to play
     # against this player
