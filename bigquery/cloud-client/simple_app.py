@@ -24,24 +24,20 @@ def query_shakespeare():
     client = bigquery.Client()
     # [END create_client]
     # [START run_query]
-    query_results = client.run_sync_query("""
-        SELECT
-            APPROX_TOP_COUNT(corpus, 10) as title,
-            COUNT(*) as unique_words
-        FROM `publicdata.samples.shakespeare`;""")
+    query_job = client.query("""
+        #standardSQL
+        SELECT corpus AS title, COUNT(*) AS unique_words
+        FROM `bigquery-public-data.samples.shakespeare`
+        GROUP BY title
+        ORDER BY unique_words DESC
+        LIMIT 10""")
 
-    # Use standard SQL syntax for queries.
-    # See: https://cloud.google.com/bigquery/sql-reference/
-    query_results.use_legacy_sql = False
-
-    query_results.run()
+    results = query_job.result()  # Waits for job to complete.
     # [END run_query]
 
     # [START print_results]
-    rows = query_results.fetch_data(max_results=10)
-
-    for row in rows:
-        print(row)
+    for row in results:
+        print("{}: {}".format(row.title, row.unique_words))
     # [END print_results]
 
 

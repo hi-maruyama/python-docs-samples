@@ -1,4 +1,5 @@
-# Copyright 2016 Google, Inc.
+# -*- coding: utf-8 -*-
+# Copyright 2017 Google, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,18 +19,19 @@ import snippets
 
 BUCKET = os.environ['CLOUD_STORAGE_BUCKET']
 TEST_FILE_URL = 'gs://{}/text.txt'.format(BUCKET)
+LONG_TEST_FILE_URL = 'gs://{}/android_text.txt'.format(BUCKET)
 
 
 def test_sentiment_text(capsys):
-    snippets.sentiment_text('President Obama is speaking at the White House.')
+    snippets.sentiment_text('No! God please, no!')
     out, _ = capsys.readouterr()
-    assert 'Score: 0.2' in out
+    assert 'Score: ' in out
 
 
 def test_sentiment_file(capsys):
     snippets.sentiment_file(TEST_FILE_URL)
     out, _ = capsys.readouterr()
-    assert 'Score: 0.2' in out
+    assert 'Score: ' in out
 
 
 def test_entities_text(capsys):
@@ -56,3 +58,40 @@ def test_syntax_file(capsys):
     snippets.syntax_file(TEST_FILE_URL)
     out, _ = capsys.readouterr()
     assert 'NOUN: President' in out
+
+
+def test_sentiment_entities_text(capsys):
+    snippets.entity_sentiment_text(
+        'President Obama is speaking at the White House.')
+    out, _ = capsys.readouterr()
+    assert 'Content : White House' in out
+
+
+def test_sentiment_entities_file(capsys):
+    snippets.entity_sentiment_file(TEST_FILE_URL)
+    out, _ = capsys.readouterr()
+    assert 'Content : White House' in out
+
+
+def test_sentiment_entities_utf(capsys):
+    snippets.entity_sentiment_text(
+        'foo→bar')
+    out, _ = capsys.readouterr()
+    assert 'Begin Offset : 4' in out
+
+
+def test_classify_text(capsys):
+    snippets.classify_text(
+        'Android is a mobile operating system developed by Google, '
+        'based on the Linux kernel and designed primarily for touchscreen '
+        'mobile devices such as smartphones and tablets.')
+    out, _ = capsys.readouterr()
+    assert 'name' in out
+    assert '/Computers & Electronics' in out
+
+
+def test_classify_file(capsys):
+    snippets.classify_file(LONG_TEST_FILE_URL)
+    out, _ = capsys.readouterr()
+    assert 'name' in out
+    assert '/Computers & Electronics' in out
