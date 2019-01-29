@@ -3,12 +3,16 @@
 Stackdriver Monitoring Python Samples
 ===============================================================================
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=monitoring/api/v3/api-client/README.rst
+
+
 This directory contains samples for Stackdriver Monitoring. `Stackdriver Monitoring `_ collects metrics, events, and metadata from Google Cloud Platform, Amazon Web Services (AWS), hosted uptime probes, application instrumentation, and a variety of common application components including Cassandra, Nginx, Apache Web Server, Elasticsearch and many others. Stackdriver ingests that data and generates insights via dashboards, charts, and alerts.
 
 
 
 
-.. _Stackdriver Monitoring: https://cloud.google.com/monitoring/docs 
+.. _Stackdriver Monitoring: https://cloud.google.com/monitoring/docs
 
 Setup
 -------------------------------------------------------------------------------
@@ -27,10 +31,16 @@ credentials for applications.
 Install Dependencies
 ++++++++++++++++++++
 
+#. Clone python-docs-samples and change directory to the sample directory you want to use.
+
+    .. code-block:: bash
+
+        $ git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+
 #. Install `pip`_ and `virtualenv`_ if you do not already have them. You may want to refer to the `Python Development Environment Setup Guide`_ for Google Cloud Platform for instructions.
 
- .. _Python Development Environment Setup Guide:
-     https://cloud.google.com/python/setup
+   .. _Python Development Environment Setup Guide:
+       https://cloud.google.com/python/setup
 
 #. Create a virtualenv. Samples are compatible with Python 2.7 and 3.4+.
 
@@ -54,6 +64,10 @@ Samples
 List resources
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=monitoring/api/v3/api-client/list_resources.py,monitoring/api/v3/api-client/README.rst
+
+
 
 
 To run this sample:
@@ -63,24 +77,29 @@ To run this sample:
     $ python list_resources.py
 
     usage: list_resources.py [-h] --project_id PROJECT_ID
-    
+
      Sample command-line program for retrieving Stackdriver Monitoring API V3
     data.
-    
+
     See README.md for instructions on setting up your development environment.
-    
+
     To run locally:
-    
+
         python list_resources.py --project_id=<YOUR-PROJECT-ID>
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       --project_id PROJECT_ID
                             Project ID you want to access.
 
 
+
 Custom metrics
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=monitoring/api/v3/api-client/custom_metric.py,monitoring/api/v3/api-client/README.rst
+
 
 
 
@@ -91,25 +110,26 @@ To run this sample:
     $ python custom_metric.py
 
     usage: custom_metric.py [-h] --project_id PROJECT_ID
-    
+
      Sample command-line program for writing and reading Stackdriver Monitoring
     API V3 custom metrics.
-    
+
     Simple command-line program to demonstrate connecting to the Google
     Monitoring API to write custom metrics and read them back.
-    
+
     See README.md for instructions on setting up your development environment.
-    
+
     This example creates a custom metric based on a hypothetical GAUGE measurement.
-    
+
     To run locally:
-    
+
         python custom_metric.py --project_id=<YOUR-PROJECT-ID>
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       --project_id PROJECT_ID
                             Project ID you want to access.
+
 
 
 

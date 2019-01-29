@@ -3,12 +3,16 @@
 Google Cloud Storage Python Samples
 ===============================================================================
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=storage/api/README.rst
+
+
 This directory contains samples for Google Cloud Storage. `Google Cloud Storage`_ allows world-wide storage and retrieval of any amount of data at any time.
 
 
 
 
-.. _Google Cloud Storage: https://cloud.google.com/storage/docs 
+.. _Google Cloud Storage: https://cloud.google.com/storage/docs
 
 Setup
 -------------------------------------------------------------------------------
@@ -27,10 +31,16 @@ credentials for applications.
 Install Dependencies
 ++++++++++++++++++++
 
+#. Clone python-docs-samples and change directory to the sample directory you want to use.
+
+    .. code-block:: bash
+
+        $ git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+
 #. Install `pip`_ and `virtualenv`_ if you do not already have them. You may want to refer to the `Python Development Environment Setup Guide`_ for Google Cloud Platform for instructions.
 
- .. _Python Development Environment Setup Guide:
-     https://cloud.google.com/python/setup
+   .. _Python Development Environment Setup Guide:
+       https://cloud.google.com/python/setup
 
 #. Create a virtualenv. Samples are compatible with Python 2.7 and 3.4+.
 
@@ -54,6 +64,10 @@ Samples
 List Objects
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=storage/api/list_objects.py,storage/api/README.rst
+
+
 
 
 To run this sample:
@@ -63,25 +77,30 @@ To run this sample:
     $ python list_objects.py
 
     usage: list_objects.py [-h] bucket
-    
+
     Command-line sample application for listing all objects in a bucket using
     the Cloud Storage API.
-    
+
     This sample is used on this page:
-    
+
         https://cloud.google.com/storage/docs/json_api/v1/json-api-python-samples
-    
+
     For more information, see the README.md under /storage.
-    
+
     positional arguments:
       bucket      Your Cloud Storage bucket.
-    
+
     optional arguments:
       -h, --help  show this help message and exit
 
 
+
 CRUD Objects
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=storage/api/crud_object.py,storage/api/README.rst
+
 
 
 
@@ -92,27 +111,32 @@ To run this sample:
     $ python crud_object.py
 
     usage: crud_object.py [-h] [--reader READER] [--owner OWNER] filename bucket
-    
+
     Application for uploading an object using the Cloud Storage API.
-    
+
     This sample is used on this page:
-    
+
         https://cloud.google.com/storage/docs/json_api/v1/json-api-python-samples
-    
+
     For more information, see the README.md under /storage.
-    
+
     positional arguments:
       filename         The name of the file to upload
       bucket           Your Cloud Storage bucket.
-    
+
     optional arguments:
       -h, --help       show this help message and exit
       --reader READER  Your Cloud Storage bucket.
       --owner OWNER    Your Cloud Storage bucket.
 
 
+
 Compose objects
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=storage/api/compose_objects.py,storage/api/README.rst
+
 
 
 
@@ -123,34 +147,39 @@ To run this sample:
     $ python compose_objects.py
 
     usage: compose_objects.py [-h] bucket destination sources [sources ...]
-    
+
     Command-line sample application for composing objects using the Cloud
     Storage API.
-    
+
     This sample is used on this page:
-    
+
         https://cloud.google.com/storage/docs/json_api/v1/json-api-python-samples
-    
+
     For more information, see the README.md under /storage.
-    
+
     To run, create a least two sample files:
         $ echo "File 1" > file1.txt
         $ echo "File 2" > file2.txt
-    
+
     Example invocation:
         $ python compose_objects.py my-bucket destination.txt file1.txt file2.txt
-    
+
     positional arguments:
       bucket       Your Cloud Storage bucket.
       destination  Destination file name.
       sources      Source files to compose.
-    
+
     optional arguments:
       -h, --help   show this help message and exit
 
 
+
 Customer-Supplied Encryption
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=storage/api/customer_supplied_keys.py,storage/api/README.rst
+
 
 
 
@@ -161,25 +190,26 @@ To run this sample:
     $ python customer_supplied_keys.py
 
     usage: customer_supplied_keys.py [-h] bucket filename
-    
+
     Command-line sample app demonstrating customer-supplied encryption keys.
-    
+
     This sample demonstrates uploading an object while supplying an encryption key,
     retrieving that object's contents, and finally rotating that key to a new
     value.
-    
+
     This sample is used on this page:
-    
+
         https://cloud.google.com/storage/docs/json_api/v1/json-api-python-samples
-    
+
     For more information, see the README.md under /storage.
-    
+
     positional arguments:
       bucket      Your Cloud Storage bucket.
       filename    A file to upload and download.
-    
+
     optional arguments:
       -h, --help  show this help message and exit
+
 
 
 

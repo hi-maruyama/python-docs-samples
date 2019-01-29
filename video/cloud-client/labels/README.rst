@@ -3,12 +3,16 @@
 Google Cloud Video Intelligence API Python Samples
 ===============================================================================
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=video/cloud-client/labels/README.rst
+
+
 This directory contains samples for Google Cloud Video Intelligence API. `Google Cloud Video Intelligence API`_ allows developers to easily integrate feature detection in video.
 
 
 
 
-.. _Google Cloud Video Intelligence API: https://cloud.google.com/video-intelligence/docs 
+.. _Google Cloud Video Intelligence API: https://cloud.google.com/video-intelligence/docs
 
 Setup
 -------------------------------------------------------------------------------
@@ -27,10 +31,16 @@ credentials for applications.
 Install Dependencies
 ++++++++++++++++++++
 
+#. Clone python-docs-samples and change directory to the sample directory you want to use.
+
+    .. code-block:: bash
+
+        $ git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+
 #. Install `pip`_ and `virtualenv`_ if you do not already have them. You may want to refer to the `Python Development Environment Setup Guide`_ for Google Cloud Platform for instructions.
 
- .. _Python Development Environment Setup Guide:
-     https://cloud.google.com/python/setup
+   .. _Python Development Environment Setup Guide:
+       https://cloud.google.com/python/setup
 
 #. Create a virtualenv. Samples are compatible with Python 2.7 and 3.4+.
 
@@ -54,6 +64,10 @@ Samples
 labels
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=video/cloud-client/labels/labels.py,video/cloud-client/labels/README.rst
+
+
 
 
 To run this sample:
@@ -63,22 +77,24 @@ To run this sample:
     $ python labels.py
 
     usage: labels.py [-h] path
-    
-    This application demonstrates how to perform basic operations with the
-    Google Cloud Video Intelligence API.
-    
+
+    This application demonstrates how to detect labels from a video
+    based on the image content with the Google Cloud Video Intelligence
+    API.
+
     For more information, check out the documentation at
     https://cloud.google.com/videointelligence/docs.
-    
+
     Usage Example:
-    
+
         python labels.py gs://cloud-ml-sandbox/video/chicago.mp4
-    
+
     positional arguments:
       path        GCS file path for label detection.
-    
+
     optional arguments:
       -h, --help  show this help message and exit
+
 
 
 

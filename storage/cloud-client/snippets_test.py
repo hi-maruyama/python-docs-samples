@@ -14,6 +14,7 @@
 
 import os
 import tempfile
+import time
 
 from google.cloud import storage
 import google.cloud.exceptions
@@ -23,6 +24,18 @@ import requests
 import snippets
 
 BUCKET = os.environ['CLOUD_STORAGE_BUCKET']
+KMS_KEY = os.environ['CLOUD_KMS_KEY']
+
+
+def test_enable_default_kms_key():
+    snippets.enable_default_kms_key(
+        bucket_name=BUCKET,
+        kms_key_name=KMS_KEY)
+    time.sleep(2)  # Let change propagate as needed
+    bucket = storage.Client().get_bucket(BUCKET)
+    assert bucket.default_kms_key_name.startswith(KMS_KEY)
+    bucket.default_kms_key_name = None
+    bucket.patch()
 
 
 def test_get_bucket_labels():
@@ -79,6 +92,19 @@ def test_upload_blob():
             'test_upload_blob')
 
 
+def test_upload_blob_with_kms():
+    with tempfile.NamedTemporaryFile() as source_file:
+        source_file.write(b'test')
+        snippets.upload_blob_with_kms(
+            BUCKET,
+            source_file.name,
+            'test_upload_blob_encrypted',
+            KMS_KEY)
+        bucket = storage.Client().bucket(BUCKET)
+        kms_blob = bucket.get_blob('test_upload_blob_encrypted')
+        assert kms_blob.kms_key_name.startswith(KMS_KEY)
+
+
 def test_download_blob(test_blob):
     with tempfile.NamedTemporaryFile() as dest_file:
         snippets.download_blob(
@@ -111,12 +137,9 @@ def test_make_blob_public(test_blob):
 
 
 def test_generate_signed_url(test_blob, capsys):
-    snippets.generate_signed_url(
+    url = snippets.generate_signed_url(
         BUCKET,
         test_blob.name)
-
-    out, _ = capsys.readouterr()
-    url = out.rsplit().pop()
 
     r = requests.get(url)
     assert r.text == 'Hello, is it me you\'re looking for?'
