@@ -1,5 +1,10 @@
 # Google Cloud Endpoints Bookstore App in Python
 
+[![Open in Cloud Shell][shell_img]][shell_link]
+
+[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
+[shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=endpoints/bookstore-grpc/README.md
+
 ## Installing the dependencies using virtualenv:
 
     virtualenv bookstore-env
@@ -50,8 +55,8 @@ gRPC libraries and tools are installed, run:
         --include_imports \
         --include_source_info \
         --proto_path=. \
-        --python_out=generated_pb2 \
-        --grpc_python_out=generated_pb2 \
+        --python_out=. \
+        --grpc_python_out=. \
         --descriptor_set_out=api_descriptor.pb \
         bookstore.proto
 

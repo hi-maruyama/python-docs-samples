@@ -1,4 +1,4 @@
-# Copyright 2016 Google Inc.
+# Copyright 2018 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
 
 """App Engine app to serve as an endpoint for App Engine queue samples."""
 
+# [START cloud_tasks_appengine_quickstart]
 from flask import Flask, request
 
 app = Flask(__name__)
 
 
-@app.route('/log_payload', methods=['POST'])
-def log_payload():
+@app.route('/example_task_handler', methods=['POST'])
+def example_task_handler():
     """Log the request payload."""
     payload = request.get_data(as_text=True) or '(empty payload)'
     print('Received task with payload: {}'.format(payload))
     return 'Printed task payload: {}'.format(payload)
+# [END cloud_tasks_appengine_quickstart]
 
 
 @app.route('/')

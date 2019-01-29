@@ -1,5 +1,10 @@
 # Endpoints Getting Started with gRPC & Python Quickstart
 
+[![Open in Cloud Shell][shell_img]][shell_link]
+
+[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
+[shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=endpoints/getting-started-grpc/README.md
+
 It is assumed that you have a working Python environment and a Google
 Cloud account and [SDK](https://cloud.google.com/sdk/) configured.
 
@@ -44,17 +49,14 @@ Cloud account and [SDK](https://cloud.google.com/sdk/) configured.
 
     ```bash
     gcloud endpoints services deploy api_descriptor.pb api_config.yaml
-    # The Config ID should be printed out, looks like: 2017-02-01r0, remember this
 
     # Set your project ID as a variable to make commands easier:
     GCLOUD_PROJECT=<Your Project ID>
 
-    # Print out your Config ID again, in case you missed it:
-    gcloud endpoints configs list --service hellogrpc.endpoints.${GCLOUD_PROJECT}.cloud.goog
     ```
 
 1. Also get an API key from the Console's API Manager for use in the
-   client later. (https://console.cloud.google.com/apis/credentials)
+   client later. [Get API Key](https://console.cloud.google.com/apis/credentials)
 
 1. Enable the Cloud Build API:
 
@@ -70,7 +72,7 @@ Cloud account and [SDK](https://cloud.google.com/sdk/) configured.
 
 1. Either deploy to GCE (below) or GKE (further down).
 
-### GCE
+## Google Compute Engine
 
 1. Enable the Compute Engine API:
 
@@ -90,7 +92,6 @@ Cloud account and [SDK](https://cloud.google.com/sdk/) configured.
     ```bash
     GCLOUD_PROJECT=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
     SERVICE_NAME=hellogrpc.endpoints.${GCLOUD_PROJECT}.cloud.goog
-    SERVICE_CONFIG_ID=<Your Config ID>
     ```
 
 1. Pull your credentials to access Container Registry, and run your gRPC server
@@ -109,7 +110,7 @@ Cloud account and [SDK](https://cloud.google.com/sdk/) configured.
         --link=grpc-hello:grpc-hello \
         gcr.io/endpoints-release/endpoints-runtime:1 \
         --service=${SERVICE_NAME} \
-        --version=${SERVICE_CONFIG_ID} \
+        --rollout_strategy=managed \
         --http2_port=9000 \
         --backend=grpc://grpc-hello:50051
     ```
@@ -132,7 +133,7 @@ Cloud account and [SDK](https://cloud.google.com/sdk/) configured.
     gcloud compute instances delete grpc-host
     ```
 
-### GKE
+### Google Kubernetes Engine
 
 1. Create a cluster. You can specify a different zone than us-central1-a if you
    want:
@@ -141,23 +142,15 @@ Cloud account and [SDK](https://cloud.google.com/sdk/) configured.
     gcloud container clusters create my-cluster --zone=us-central1-a
     ```
 
-1. Edit `container-engine.yaml`. Replace `SERVICE_NAME`, `SERVICE_CONFIG_ID`,
-   and `GCLOUD_PROJECT` with your values:
+1. Edit `deployment.yaml`. Replace `SERVICE_NAME` and `GCLOUD_PROJECT` with your values:
 
    `SERVICE_NAME` is equal to hellogrpc.endpoints.GCLOUD_PROJECT.cloud.goog,
    replacing GCLOUD_PROJECT with your project ID.
 
-   `SERVICE_CONFIG_ID` can be found by running the following command, replacing
-   GCLOUD_PROJECT with your project ID.
-
-   ```bash
-   gcloud endpoints configs list --service hellogrpc.endpoints.GCLOUD_PROJECT.cloud.goog
-   ```
-
 1. Deploy to GKE:
 
     ```bash
-    kubectl create -f ./container-engine.yaml
+    kubectl create -f ./deployment.yaml
     ```
 
 1. Get IP of load balancer, run until you see an External IP:

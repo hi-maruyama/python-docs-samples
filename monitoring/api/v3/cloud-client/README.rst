@@ -3,6 +3,10 @@
 Google Stackdriver Monitoring API Python Samples
 ===============================================================================
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=monitoring/api/v3/cloud-client/README.rst
+
+
 This directory contains samples for Google Stackdriver Monitoring API. Stackdriver Monitoring collects metrics, events, and metadata from Google Cloud Platform, Amazon Web Services (AWS), hosted uptime probes, application instrumentation, and a variety of common application components including Cassandra, Nginx, Apache Web Server, Elasticsearch
  and many others. Stackdriver ingests that data and generates insights
  via dashboards, charts, and alerts.
@@ -10,7 +14,7 @@ This directory contains samples for Google Stackdriver Monitoring API. Stackdriv
 
 
 
-.. _Google Stackdriver Monitoring API: https://cloud.google.com/monitoring/docs/ 
+.. _Google Stackdriver Monitoring API: https://cloud.google.com/monitoring/docs/
 
 Setup
 -------------------------------------------------------------------------------
@@ -29,10 +33,16 @@ credentials for applications.
 Install Dependencies
 ++++++++++++++++++++
 
+#. Clone python-docs-samples and change directory to the sample directory you want to use.
+
+    .. code-block:: bash
+
+        $ git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+
 #. Install `pip`_ and `virtualenv`_ if you do not already have them. You may want to refer to the `Python Development Environment Setup Guide`_ for Google Cloud Platform for instructions.
 
- .. _Python Development Environment Setup Guide:
-     https://cloud.google.com/python/setup
+   .. _Python Development Environment Setup Guide:
+       https://cloud.google.com/python/setup
 
 #. Create a virtualenv. Samples are compatible with Python 2.7 and 3.4+.
 
@@ -56,6 +66,10 @@ Samples
 Quickstart
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=monitoring/api/v3/cloud-client/quickstart.py,monitoring/api/v3/cloud-client/README.rst
+
+
 
 
 To run this sample:
@@ -68,6 +82,10 @@ To run this sample:
 Snippets
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+.. image:: https://gstatic.com/cloudssh/images/open-btn.png
+   :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=monitoring/api/v3/cloud-client/snippets.py,monitoring/api/v3/cloud-client/README.rst
+
+
 
 
 To run this sample:
@@ -79,9 +97,9 @@ To run this sample:
     usage: snippets.py [-h]
                        {create-metric-descriptor,list-metric-descriptors,get-metric-descriptor,delete-metric-descriptor,list-resources,get-resource,write-time-series,list-time-series,list-time-series-header,list-time-series-reduce,list-time-series-aggregate}
                        ...
-    
+
     Demonstrates Monitoring API operations.
-    
+
     positional arguments:
       {create-metric-descriptor,list-metric-descriptors,get-metric-descriptor,delete-metric-descriptor,list-resources,get-resource,write-time-series,list-time-series,list-time-series-header,list-time-series-reduce,list-time-series-aggregate}
         create-metric-descriptor
@@ -95,9 +113,10 @@ To run this sample:
         list-time-series-header
         list-time-series-reduce
         list-time-series-aggregate
-    
+
     optional arguments:
       -h, --help            show this help message and exit
+
 
 
 

@@ -1,5 +1,10 @@
 # Google App Engine Samples
 
+[![Open in Cloud Shell][shell_img]][shell_link]
+
+[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
+[shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=appengine/standard/README.md
+
 This section contains samples for [Google App Engine](https://cloud.google.com/appengine). Most of these samples have associated documentation that is linked
 within the docstring of the sample itself.
 
@@ -29,7 +34,7 @@ Some samples may require additional setup. Refer to individual sample READMEs.
 
         gcloud app deploy --project your-app-id -v your-version
 
-4. Visit `https://your-app-id.appost.com` to view your application.
+4. Visit `https://your-app-id.appspot.com` to view your application.
 
 ## Additional resources
 
